@@ -1,6 +1,14 @@
-import React, {useState} from 'react';
-import {View, Text, ImageBackground, StyleSheet} from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
@@ -10,6 +18,8 @@ import Task from '../components/Task';
 import {FlatList} from 'react-native-gesture-handler';
 
 export default props => {
+  const [showDoneTasks, setShowDoneTasks] = useState(true);
+  const [visibleTasks, setVisibleTasks] = useState([]);
   const [tasks, setTasks] = useState([
     {
       id: Math.random(),
@@ -24,6 +34,27 @@ export default props => {
       doneAt: null,
     },
   ]);
+
+  useEffect(() => {
+    filterTasks();
+  }, [filterTasks, showDoneTasks, tasks]);
+
+  function toggleFilter() {
+    setShowDoneTasks(!showDoneTasks);
+  }
+
+  const filterTasks = useCallback(() => {
+    let _visibleTasks = null;
+
+    if (showDoneTasks) {
+      _visibleTasks = [...tasks];
+    } else {
+      const pedding = task => task.doneAt === null;
+      _visibleTasks = tasks.filter(pedding);
+    }
+
+    setVisibleTasks(_visibleTasks);
+  }, [showDoneTasks, tasks]);
 
   function toggleTask(taskId) {
     const _tasks = [...tasks];
@@ -43,6 +74,15 @@ export default props => {
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.background} source={todayImage}>
+        <View style={styles.iconBar}>
+          <TouchableOpacity onPress={toggleFilter}>
+            <Icon
+              name={showDoneTasks ? 'eye' : 'eye-slash'}
+              size={20}
+              color={commonStyles.colors.secondary}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.titleBar}>
           <Text style={styles.title}>Hoje</Text>
           <Text style={styles.subtitle}>{today}</Text>
@@ -50,7 +90,7 @@ export default props => {
       </ImageBackground>
       <View style={styles.taskList}>
         <FlatList
-          data={tasks}
+          data={visibleTasks}
           keyExtractor={item => String(item.id)}
           renderItem={({item}) => <Task {...item} toggleTask={toggleTask} />}
         />
@@ -86,5 +126,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 20,
     marginBottom: 30,
+  },
+  iconBar: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    justifyContent: 'flex-end',
+    marginTop: Platform.OS === 'ios' ? 40 : 10,
   },
 });
