@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, ImageBackground, StyleSheet} from 'react-native';
 
 import moment from 'moment';
@@ -10,7 +10,7 @@ import Task from '../components/Task';
 import {FlatList} from 'react-native-gesture-handler';
 
 export default props => {
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: Math.random(),
       desc: 'Comprar Livro',
@@ -23,7 +23,18 @@ export default props => {
       estimateAt: new Date(),
       doneAt: null,
     },
-  ];
+  ]);
+
+  function toggleTask(taskId) {
+    const _tasks = [...tasks];
+    _tasks.forEach(task => {
+      if (task.id === taskId) {
+        task.doneAt = task.doneAt ? null : new Date();
+      }
+    });
+
+    setTasks(_tasks);
+  }
 
   const today = moment()
     .locale('pt-br')
@@ -41,7 +52,7 @@ export default props => {
         <FlatList
           data={tasks}
           keyExtractor={item => String(item.id)}
-          renderItem={({item}) => <Task {...item} />}
+          renderItem={({item}) => <Task {...item} toggleTask={toggleTask} />}
         />
       </View>
     </View>
