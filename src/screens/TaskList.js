@@ -9,17 +9,19 @@ import {
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {FlatList} from 'react-native-gesture-handler';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
 import todayImage from '../../assets/imgs/today.jpg';
 import commonStyles from '../commonStyles';
 import Task from '../components/Task';
-import {FlatList} from 'react-native-gesture-handler';
+import AddTask from './AddTask';
 
 export default props => {
   const [showDoneTasks, setShowDoneTasks] = useState(true);
   const [visibleTasks, setVisibleTasks] = useState([]);
+  const [showAddTask, setShowAddTask] = useState(false);
   const [tasks, setTasks] = useState([
     {
       id: Math.random(),
@@ -73,6 +75,7 @@ export default props => {
 
   return (
     <View style={styles.container}>
+      <AddTask isVisible={showAddTask} onCancel={() => setShowAddTask(false)} />
       <ImageBackground style={styles.background} source={todayImage}>
         <View style={styles.iconBar}>
           <TouchableOpacity onPress={toggleFilter}>
@@ -95,6 +98,12 @@ export default props => {
           renderItem={({item}) => <Task {...item} toggleTask={toggleTask} />}
         />
       </View>
+      <TouchableOpacity
+        style={styles.addButton}
+        activeOpacity={0.7}
+        onPress={() => setShowAddTask(true)}>
+        <Icon name="plus" size={20} color={commonStyles.colors.secondary} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -132,5 +141,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     justifyContent: 'flex-end',
     marginTop: Platform.OS === 'ios' ? 40 : 10,
+  },
+  addButton: {
+    position: 'absolute',
+    right: 30,
+    bottom: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: commonStyles.colors.today,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
