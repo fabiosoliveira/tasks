@@ -7,12 +7,46 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Text,
+  Platform,
 } from 'react-native';
+
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 import commonStyles from '../commonStyles';
 
 export default props => {
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [desc, setDesc] = useState('');
+
+  function getDatePicker() {
+    let datePicker = (
+      <DateTimePicker
+        value={date}
+        onChange={(_, date) => {
+          setDate(date);
+          setShowDatePicker(false);
+        }}
+        mode="date"
+      />
+    );
+
+    const dateString = moment(date).format('ddd, D [de] MMMM [de] YYYY');
+
+    if (Platform.OS === 'android') {
+      datePicker = (
+        <View>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <Text style={styles.date}>{dateString}</Text>
+          </TouchableOpacity>
+          {showDatePicker && datePicker}
+        </View>
+      );
+    }
+
+    return datePicker;
+  }
 
   return (
     <Modal
@@ -31,6 +65,7 @@ export default props => {
           value={desc}
           onChangeText={texto => setDesc(texto)}
         />
+        {getDatePicker()}
         <View style={styles.buttons}>
           <TouchableOpacity onPress={props.onCancel}>
             <Text style={styles.button}>Cancelar</Text>
@@ -80,5 +115,10 @@ const styles = StyleSheet.create({
     margin: 20,
     marginRight: 30,
     color: commonStyles.colors.today,
+  },
+  date: {
+    fontFamily: commonStyles.fontFamily,
+    fontSize: 20,
+    marginLeft: 15,
   },
 });
