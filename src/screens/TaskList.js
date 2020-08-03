@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   FlatList,
+  Alert,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -69,13 +70,35 @@ export default props => {
     setTasks(_tasks);
   }
 
+  function addTask(newTask) {
+    if (!newTask.desc || !newTask.desc.trim()) {
+      Alert.alert('Dados Inválidos', 'Descrição não informada!');
+      return;
+    }
+
+    const _tasks = [...tasks];
+    _tasks.push({
+      id: Math.random(),
+      desc: newTask.desc,
+      estimateAt: newTask.date,
+      doneAt: null,
+    });
+
+    setTasks(_tasks);
+    setShowAddTask(false);
+  }
+
   const today = moment()
     .locale('pt-br')
     .format('ddd, D [de] MMMM');
 
   return (
     <View style={styles.container}>
-      <AddTask isVisible={showAddTask} onCancel={() => setShowAddTask(false)} />
+      <AddTask
+        isVisible={showAddTask}
+        onCancel={() => setShowAddTask(false)}
+        onSave={addTask}
+      />
       <ImageBackground style={styles.background} source={todayImage}>
         <View style={styles.iconBar}>
           <TouchableOpacity onPress={toggleFilter}>

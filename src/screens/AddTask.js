@@ -20,6 +20,21 @@ export default props => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [desc, setDesc] = useState('');
 
+  function save() {
+    const newTask = {
+      desc,
+      date,
+    };
+
+    if (props.onSave) {
+      props.onSave(newTask);
+    }
+
+    setDate(new Date());
+    setShowDatePicker(false);
+    setDesc('');
+  }
+
   function getDatePicker() {
     let datePicker = (
       <DateTimePicker
@@ -70,7 +85,7 @@ export default props => {
           <TouchableOpacity onPress={props.onCancel}>
             <Text style={styles.button}>Cancelar</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={save}>
             <Text style={styles.button}>Salvar</Text>
           </TouchableOpacity>
         </View>
