@@ -88,6 +88,12 @@ export default props => {
     setShowAddTask(false);
   }
 
+  function deleteTask(id) {
+    const _tasks = tasks.filter(task => task.id !== id);
+
+    setTasks(_tasks);
+  }
+
   const today = moment()
     .locale('pt-br')
     .format('ddd, D [de] MMMM');
@@ -118,7 +124,9 @@ export default props => {
         <FlatList
           data={visibleTasks}
           keyExtractor={item => String(item.id)}
-          renderItem={({item}) => <Task {...item} toggleTask={toggleTask} />}
+          renderItem={({item}) => (
+            <Task {...item} onToggleTask={toggleTask} onDelete={deleteTask} />
+          )}
         />
       </View>
       <TouchableOpacity

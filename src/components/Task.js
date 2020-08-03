@@ -26,7 +26,9 @@ export default props => {
 
   function getRightContent() {
     return (
-      <TouchableOpacity style={styles.right}>
+      <TouchableOpacity
+        style={styles.right}
+        onPress={() => props.onDelete && props.onDelete(props.id)}>
         <Icon name="trash" size={30} color="#FFF" />
       </TouchableOpacity>
     );
@@ -44,9 +46,10 @@ export default props => {
   return (
     <Swipeable
       renderRightActions={getRightContent}
-      renderLeftActions={getLeftContent}>
+      renderLeftActions={getLeftContent}
+      onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}>
       <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={() => props.toggleTask(props.id)}>
+        <TouchableWithoutFeedback onPress={() => props.onToggleTask(props.id)}>
           <View style={styles.checkContainer}>
             {getCheckView(props.doneAt)}
           </View>
