@@ -40,8 +40,8 @@ export default props => {
       <DateTimePicker
         value={date}
         onChange={(_, date) => {
-          setDate(date);
           setShowDatePicker(false);
+          setDate(date);
         }}
         mode="date"
       />
