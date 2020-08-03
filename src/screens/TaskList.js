@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-community/async-storage';
+
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
@@ -23,24 +25,41 @@ export default props => {
   const [showDoneTasks, setShowDoneTasks] = useState(true);
   const [visibleTasks, setVisibleTasks] = useState([]);
   const [showAddTask, setShowAddTask] = useState(false);
-  const [tasks, setTasks] = useState([
-    {
-      id: Math.random(),
-      desc: 'Comprar Livro',
-      estimateAt: new Date(),
-      doneAt: new Date(),
-    },
-    {
-      id: Math.random(),
-      desc: 'Ler Livro',
-      estimateAt: new Date(),
-      doneAt: null,
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     filterTasks();
-  }, [filterTasks, showDoneTasks, tasks]);
+  }, [filterTasks, showDoneTasks, showAddTask, tasks]);
+
+  useEffect(() => {
+    const f = async () => {
+      const stateString = await AsyncStorage.getItem('tasksState');
+      const state = JSON.parse(stateString);
+
+      if (!state) {
+        return;
+      }
+
+      setShowAddTask(state.showAddTask);
+      setShowDoneTasks(state.showDoneTasks);
+      setVisibleTasks(state.visibleTasks);
+      setTasks(state.tasks);
+    };
+
+    f();
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem(
+      'tasksState',
+      JSON.stringify({
+        showAddTask,
+        showDoneTasks,
+        visibleTasks,
+        tasks,
+      }),
+    );
+  }, [showAddTask, showDoneTasks, tasks, visibleTasks]);
 
   function toggleFilter() {
     setShowDoneTasks(!showDoneTasks);
