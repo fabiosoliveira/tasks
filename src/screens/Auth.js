@@ -4,14 +4,13 @@ import {
   Text,
   StyleSheet,
   View,
-  TextInput,
   TouchableOpacity,
-  Platform,
   Alert,
 } from 'react-native';
 
 import backgroundImage from '../../assets/imgs/login.jpg';
 import commonStyle from '../commonStyles';
+import AuthInput from '../components/AuthInput';
 
 export default props => {
   const [name, setName] = useState('');
@@ -36,20 +35,23 @@ export default props => {
           {stageNew ? 'Cria a sua conta' : 'Informe seus dados'}
         </Text>
         {stageNew && (
-          <TextInput
+          <AuthInput
+            icon="user"
             placeholder="Nome"
             value={name}
             style={styles.input}
             onChangeText={text => setName(text)}
           />
         )}
-        <TextInput
+        <AuthInput
+          icon="at"
           placeholder="E-mail"
           value={email}
           style={styles.input}
           onChangeText={text => setEmail(text)}
         />
-        <TextInput
+        <AuthInput
+          icon="lock"
           placeholder="Senha"
           value={password}
           style={styles.input}
@@ -57,7 +59,8 @@ export default props => {
           onChangeText={text => setPassword(text)}
         />
         {stageNew && (
-          <TextInput
+          <AuthInput
+            icon="asterisk"
             placeholder="Confirmação de Senha"
             value={confirmPassword}
             style={styles.input}
@@ -112,13 +115,13 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#FFF',
     marginTop: 10,
-    padding: Platform.OS === 'ios' ? 15 : 10,
   },
   button: {
     backgroundColor: '#080',
     marginTop: 10,
     padding: 10,
     alignItems: 'center',
+    borderRadius: 7,
   },
   buttonText: {
     fontFamily: commonStyle.fontFamily,
