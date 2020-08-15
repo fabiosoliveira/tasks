@@ -13,9 +13,11 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 
+import axios from 'axios';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
+import {server, showError} from '../common';
 import todayImage from '../../assets/imgs/today.jpg';
 import commonStyles from '../commonStyles';
 import Task from '../components/Task';
@@ -40,26 +42,33 @@ export default props => {
         return;
       }
 
-      setShowAddTask(state.showAddTask);
       setShowDoneTasks(state.showDoneTasks);
-      setVisibleTasks(state.visibleTasks);
-      setTasks(state.tasks);
     };
 
     f();
+    loadTasks();
   }, []);
 
   useEffect(() => {
     AsyncStorage.setItem(
       'tasksState',
       JSON.stringify({
-        showAddTask,
         showDoneTasks,
-        visibleTasks,
-        tasks,
       }),
     );
-  }, [showAddTask, showDoneTasks, tasks, visibleTasks]);
+  }, [showDoneTasks]);
+
+  async function loadTasks() {
+    try {
+      const maxDate = moment().format('YYYY-MM-DD 23:59:59');
+
+      const res = await axios.get(`${server}/tasks?date=${maxDate}`);
+
+      setTasks(res.data);
+    } catch (e) {
+      showError(e);
+    }
+  }
 
   function toggleFilter() {
     setShowDoneTasks(!showDoneTasks);
@@ -78,39 +87,44 @@ export default props => {
     setVisibleTasks(_visibleTasks);
   }, [showDoneTasks, tasks]);
 
-  function toggleTask(taskId) {
-    const _tasks = [...tasks];
-    _tasks.forEach(task => {
-      if (task.id === taskId) {
-        task.doneAt = task.doneAt ? null : new Date();
-      }
-    });
+  async function toggleTask(taskId) {
+    try {
+      await axios.put(`${server}/tasks/${taskId}/toggle`);
 
-    setTasks(_tasks);
+      loadTasks();
+    } catch (e) {
+      showError(e);
+    }
   }
 
-  function addTask(newTask) {
+  async function addTask(newTask) {
     if (!newTask.desc || !newTask.desc.trim()) {
       Alert.alert('Dados Inválidos', 'Descrição não informada!');
       return;
     }
 
-    const _tasks = [...tasks];
-    _tasks.push({
-      id: Math.random(),
-      desc: newTask.desc,
-      estimateAt: newTask.date,
-      doneAt: null,
-    });
+    try {
+      await axios.post(`${server}/tasks`, {
+        desc: newTask.desc,
+        estimateAt: newTask.date,
+      });
 
-    setTasks(_tasks);
-    setShowAddTask(false);
+      setShowAddTask(false);
+
+      loadTasks();
+    } catch (e) {
+      showError(e);
+    }
   }
 
-  function deleteTask(id) {
-    const _tasks = tasks.filter(task => task.id !== id);
+  async function deleteTask(taskId) {
+    try {
+      await axios.delete(`${server}/tasks/${taskId}`);
 
-    setTasks(_tasks);
+      loadTasks();
+    } catch (e) {
+      showError(e);
+    }
   }
 
   const today = moment()

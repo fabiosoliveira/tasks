@@ -16,8 +16,8 @@ import {server, showError, showSuccess} from '../common';
 
 export default props => {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('leonardo@coder.com.br');
+  const [password, setPassword] = useState('123456');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [stageNew, setStageNew] = useState(false);
 
