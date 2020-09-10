@@ -6,7 +6,9 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
+
 import axios from 'axios';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import backgroundImage from '../../assets/imgs/login.jpg';
 import commonStyle from '../commonStyles';
@@ -16,8 +18,8 @@ import {server, showError, showSuccess} from '../common';
 
 export default props => {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('leonardo@coder.com.br');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState(''); // leonardo@coder.com.br
+  const [password, setPassword] = useState(''); // 123456
   const [confirmPassword, setConfirmPassword] = useState('');
   const [stageNew, setStageNew] = useState(false);
 
@@ -60,8 +62,9 @@ export default props => {
         password,
       });
 
+      AsyncStorage.setItem('userData', JSON.stringify(res.data));
       axios.defaults.headers.common.Authorization = `bearer ${res.data.token}`;
-      props.navigation.navigate('Home');
+      props.navigation.navigate('Home', res.data);
     } catch (e) {
       showError(e);
     }
